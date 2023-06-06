@@ -5,6 +5,17 @@ import Colors from '../constants/Colors';
 import { ExternalLink } from './ExternalLink';
 import { MonoText } from './StyledText';
 import { Text, View } from './Themed';
+import {
+  Box,
+  VStack,
+  FormControl,
+  Input,
+  Radio,
+  Divider,
+  Checkbox,
+  AddIcon,
+  Button,
+} from 'native-base';
 
 type AddScreenProps = {
   type: 'work' | 'worker';
@@ -12,58 +23,31 @@ type AddScreenProps = {
 
 export default function AddScreen({ type }: AddScreenProps) {
   return (
-    <View>
-      <View style={styles.getStartedContainer}>
-        <Text
-          style={styles.getStartedText}
-          lightColor='rgba(0,0,0,0.8)'
-          darkColor='rgba(255,255,255,0.8)'
-        ></Text>
-
-        <View
-          style={[styles.codeHighlightContainer, styles.homeScreenFilename]}
-          darkColor='rgba(255,255,255,0.05)'
-          lightColor='rgba(0,0,0,0.05)'
-        >
-          <MonoText>{type}</MonoText>
-        </View>
-
-        <Text
-          style={styles.getStartedText}
-          lightColor='rgba(0,0,0,0.8)'
-          darkColor='rgba(255,255,255,0.8)'
-        ></Text>
-      </View>
-    </View>
+    <Box p='8'>
+      <VStack space='5'>
+        <FormControl>
+          <FormControl.Label mb='3'>What's your event called?</FormControl.Label>
+          <Input placeholder="Event's Name" />
+        </FormControl>
+        <FormControl>
+          <FormControl.Label mb='3'>When is your Event?</FormControl.Label>
+          <Radio.Group nativeID='patani' name='day_night'>
+            <VStack space='3'>
+              <Radio value='day'>Day</Radio>
+              <Radio value='night'>Night</Radio>
+            </VStack>
+          </Radio.Group>
+        </FormControl>
+        <Divider />
+        <Checkbox size='sm' value='tnc' justifyContent='center' mb='4'>
+          I agree to Terms and conditions
+        </Checkbox>
+      </VStack>
+      <Button mt='2' endIcon={<AddIcon size='3' />}>
+        Create Event
+      </Button>
+    </Box>
   );
 }
 
-const styles = StyleSheet.create({
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightContainer: {
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  helpContainer: {
-    marginTop: 15,
-    marginHorizontal: 20,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    textAlign: 'center',
-  },
-});
+const styles = StyleSheet.create({});
