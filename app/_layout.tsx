@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, usePathname, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Text, useColorScheme } from 'react-native';
+import { NativeBaseProvider } from 'native-base';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -40,19 +41,21 @@ function RootLayoutNav() {
 
   return (
     <>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='add/work'
-            options={{ presentation: 'card', headerTitle: 'Add Work' }}
-          />
-          <Stack.Screen
-            name='add/worker'
-            options={{ presentation: 'card', headerTitle: 'Add Worker' }}
-          />
-        </Stack>
-      </ThemeProvider>
+      <NativeBaseProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='add/work'
+              options={{ presentation: 'card', headerTitle: 'Add Work' }}
+            />
+            <Stack.Screen
+              name='add/worker'
+              options={{ presentation: 'card', headerTitle: 'Add Worker' }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </NativeBaseProvider>
     </>
   );
 }
