@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -16,11 +16,67 @@ import {
   HStack,
 } from 'native-base';
 import { View } from '../../components/Themed';
-import { WORKERS } from '../../constants/workers';
+import { WORKERS as CONSTANTS_WORKERS } from '../../constants/workers';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
+  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
+  projectId: 'byteme-a2fdf',
+  storageBucket: 'byteme-a2fdf.appspot.com',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 export default function AddWorkScreen() {
   const [isLoading, setLoading] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [worker, setWorker] = useState('');
+  const [shift, setShift] = useState('day');
+  const [difficulty, setDifficulty] = useState('1');
+  const [workers, setWorkers] = useState([]);
+
+  useEffect(() => {
+    const fetchWorkers = async () => {
+      try {
+        const workersCollectionRef = firebase.firestore().collection('workers');
+        const snapshot = await workersCollectionRef.get();
+
+        const workersData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setWorkers([...CONSTANTS_WORKERS, ...workersData]);
+      } catch (error) {
+        console.error('Error fetching workers from Firestore:', error);
+      }
+    };
+
+    fetchWorkers();
+  }, []);
+
+  const addWork = () => {
+    const worksCollectionRef = firebase.firestore().collection('works');
+    worksCollectionRef
+      .add({
+        title: title,
+        description: description,
+        worker: worker,
+        shift: shift,
+        difficulty: difficulty,
+      })
+      .then(() => {
+        console.log('Work added to Firestore');
+      })
+      .catch((error) => {
+        console.error('Error adding work to Firestore:', error);
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -28,11 +84,19 @@ export default function AddWorkScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Work Title?</FormControl.Label>
-            <Input placeholder='Title' borderRadius={9} />
+            <Input
+              placeholder='Title'
+              borderRadius={9}
+              onChangeText={(text) => setTitle(text)}
+            />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Work Description?</FormControl.Label>
-            <Input placeholder='Description' borderRadius={9} />
+            <Input
+              placeholder='Description'
+              borderRadius={9}
+              onChangeText={(text) => setDescription(text)}
+            />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Worker?</FormControl.Label>
@@ -49,7 +113,7 @@ export default function AddWorkScreen() {
               mt={1}
               onValueChange={(itemValue) => setWorker(itemValue)}
             >
-              {WORKERS.map((worker) => (
+              {workers.map((worker) => (
                 <Select.Item key={worker.id} label={worker.name} value={worker.id.toString()} />
               ))}
             </Select>
@@ -57,9 +121,10 @@ export default function AddWorkScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Shift?</FormControl.Label>
             <Radio.Group
-              nativeID='patani'
               name='day_night'
-              defaultValue='day'
+              value={shift}
+              onChange={(nextValue) => setShift(nextValue)}
+              accessibilityLabel='choose shift'
               colorScheme='secondary'
             >
               <HStack space='3'>
@@ -71,9 +136,10 @@ export default function AddWorkScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Difficulty?</FormControl.Label>
             <Radio.Group
-              nativeID='patani'
               name='difficulty'
-              defaultValue='1'
+              value={difficulty}
+              onChange={(nextValue) => setDifficulty(nextValue)}
+              accessibilityLabel='choose difficulty'
               colorScheme='secondary'
             >
               <HStack space='3'>
@@ -103,6 +169,7 @@ export default function AddWorkScreen() {
           borderRadius={10}
           onPress={() => {
             setLoading(true);
+            addWork();
             setTimeout(() => {
               setLoading(false);
             }, 2000);
@@ -111,8 +178,6 @@ export default function AddWorkScreen() {
           Create Work
         </Button>
       </Box>
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );
@@ -121,7 +186,5 @@ export default function AddWorkScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
 });
