@@ -86,7 +86,7 @@ export default function RateWorkerScreen() {
 
           <Divider my='2' />
           <VStack space='1'>
-            <HStack alignItems='start'>
+            <HStack>
               <Heading mx='auto' size='xs' color='gray.500'>
                 {name} Details
               </Heading>
