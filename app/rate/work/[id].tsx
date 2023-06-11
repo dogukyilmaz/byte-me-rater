@@ -24,7 +24,7 @@ import type { RateWorkSearchParams } from '../../../types';
 
 import { WORKS_COMMENTS } from '../../../constants/works';
 
-export default function AddWorkScreen() {
+export default function RateWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
 
