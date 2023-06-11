@@ -36,20 +36,20 @@ export default function AddWorkerScreen() {
   const [difficulty, setDifficulty] = useState('5');
 
   const addWorker = () => {
-    const workersCollectionRef = firebase.firestore().collection('workers');
-    workersCollectionRef
-      .add({
-        name: worker,
-        description: description,
-        preferredShift: groupValues,
-        difficulty: difficulty,
-      })
-      .then(() => {
-        console.log('Worker added to Firestore');
-      })
-      .catch((error) => {
-        console.error('Error adding worker to Firestore:', error);
-      });
+    // const workersCollectionRef = firebase.firestore().collection('workers');
+    // workersCollectionRef
+    //   .add({
+    //     name: worker,
+    //     description: description,
+    //     preferredShift: groupValues,
+    //     difficulty: difficulty,
+    //   })
+    //   .then(() => {
+    //     console.log('Worker added to Firestore');
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error adding worker to Firestore:', error);
+    //   });
   };
 
   return (
@@ -58,11 +58,7 @@ export default function AddWorkerScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Worker Name?</FormControl.Label>
-            <Input
-              placeholder='Title'
-              borderRadius={9}
-              onChangeText={(text) => setWorker(text)}
-            />
+            <Input placeholder='Title' borderRadius={9} onChangeText={(text) => setWorker(text)} />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Worker Description?</FormControl.Label>

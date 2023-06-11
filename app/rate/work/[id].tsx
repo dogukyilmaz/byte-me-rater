@@ -23,21 +23,11 @@ import { ratingColorPicker } from '../../../utils';
 import type { RateWorkSearchParams } from '../../../types';
 
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
-  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
-  projectId: 'byteme-a2fdf',
-  storageBucket: 'byteme-a2fdf.appspot.com',
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
 export default function AddWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [rating, setRating] = useState('5');
@@ -47,10 +37,7 @@ export default function AddWorkScreen() {
 
     try {
       const worksCollectionRef = firebase.firestore().collection('works');
-      const querySnapshot = await worksCollectionRef
-        .where('title', '==', title)
-        .limit(1)
-        .get();
+      const querySnapshot = await worksCollectionRef.where('title', '==', title).limit(1).get();
 
       if (!querySnapshot.empty) {
         const workDoc = querySnapshot.docs[0];
@@ -79,10 +66,7 @@ export default function AddWorkScreen() {
     const fetchComments = async () => {
       try {
         const worksCollectionRef = firebase.firestore().collection('works');
-        const querySnapshot = await worksCollectionRef
-          .where('title', '==', title)
-          .limit(1)
-          .get();
+        const querySnapshot = await worksCollectionRef.where('title', '==', title).limit(1).get();
 
         if (!querySnapshot.empty) {
           const workDoc = querySnapshot.docs[0];

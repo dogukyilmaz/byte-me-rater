@@ -1,17 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { randomNumber } from '../utils';
-
-export type Shift = 'day' | 'night';
-
-export type Work = {
-  id: string;
-  title: string;
-  description: string;
-  worker: string | null;
-  shift: Shift;
-  difficulty: number;
-  rating: number;
-};
+import { Work } from '../types';
 
 export const WORKS: Work[] = [
   {
