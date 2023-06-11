@@ -41,7 +41,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
   return (
     <Box flex={1} paddingLeft={4}>
       <Filter />
-
+  
       <FlatList
         data={data}
         renderItem={({ item }) => (
@@ -50,11 +50,11 @@ const WorkerList = ({ data }: WorkerListProps) => {
             href={{
               pathname: `/rate/worker/${item.id}`,
               params: {
-                name: item.name,
-                description: item.description,
-                maxDifficulty: item.maxDifficulty,
-                rating: item.rating,
-                gender: item.gender,
+                name: item.name || "Doesn't exist",
+                description: item.description || "Doesn't exist",
+                maxDifficulty: item.maxDifficulty || "Doesn't exist",
+                rating: item.rating || "Doesn't exist",
+                gender: item.gender || "Doesn't exist",
               },
             }}
           >
@@ -78,7 +78,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
                   my='auto'
                 >
                   <Avatar bg={item.gender === 'f' ? 'red.400' : 'blue.500'}>
-                    {getInitials(item.name)}
+                    {getInitials(item.name) || '.'}
                   </Avatar>
                 </Center>
                 <VStack space='1'>
@@ -92,9 +92,9 @@ const WorkerList = ({ data }: WorkerListProps) => {
                       color={'coolGray.800'}
                       bold
                     >
-                      {item.name}
+                      {item.name || "Doesn't exist"}
                     </Text>
-
+  
                     <Badge
                       borderRadius={9}
                       bg={difficultyColorPicker(item.maxDifficulty)}
@@ -106,10 +106,10 @@ const WorkerList = ({ data }: WorkerListProps) => {
                         color: item.maxDifficulty > 3 ? 'dark.900' : 'dark.400',
                       }}
                     >
-                      {difficultyTagPicker(item.maxDifficulty)}
+                      {difficultyTagPicker(item.maxDifficulty) || '.'}
                     </Badge>
                   </HStack>
-                  <RatingStars rating={item.rating} />
+                  <RatingStars rating={item.rating || 3} />
                   <Text
                     noOfLines={3}
                     maxW={275}
@@ -119,16 +119,16 @@ const WorkerList = ({ data }: WorkerListProps) => {
                       color: 'warmGray.200',
                     }}
                   >
-                    {item.description}
+                    {item.description || "Doesn't exist"}
                   </Text>
                 </VStack>
                 <Spacer />
                 <VStack>
                   <HStack space='1' ml='auto'>
-                    {item.preferredShift.includes('night') && (
+                    {item.preferredShift?.includes('night') && (
                       <MoonIcon size={5} color={'coolGray.600'} />
                     )}
-                    {item.preferredShift.includes('day') && (
+                    {item.preferredShift?.includes('day') && (
                       <SunIcon size={5} color={'yellow.400'} />
                     )}
                   </HStack>
@@ -141,7 +141,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
       />
     </Box>
   );
-};
+                    };  
 
 export default WorkerList;
 
