@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -14,10 +14,43 @@ import {
   HStack,
 } from 'native-base';
 import { View } from '../../components/Themed';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
+  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
+  projectId: 'byteme-a2fdf',
+  storageBucket: 'byteme-a2fdf.appspot.com',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 export default function AddWorkerScreen() {
   const [isLoading, setLoading] = useState(false);
+  const [worker, setWorker] = useState('');
+  const [description, setDescription] = useState('');
   const [groupValues, setGroupValues] = useState(['day', 'night']);
+  const [difficulty, setDifficulty] = useState('5');
+
+  const addWorker = () => {
+    const workersCollectionRef = firebase.firestore().collection('workers');
+    workersCollectionRef
+      .add({
+        name: worker,
+        description: description,
+        preferredShift: groupValues,
+        difficulty: difficulty,
+      })
+      .then(() => {
+        console.log('Worker added to Firestore');
+      })
+      .catch((error) => {
+        console.error('Error adding worker to Firestore:', error);
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -25,11 +58,19 @@ export default function AddWorkerScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Worker Name?</FormControl.Label>
-            <Input placeholder='Title' borderRadius={9} />
+            <Input
+              placeholder='Title'
+              borderRadius={9}
+              onChangeText={(text) => setWorker(text)}
+            />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Worker Description?</FormControl.Label>
-            <Input placeholder='Description' borderRadius={9} />
+            <Input
+              placeholder='Description'
+              borderRadius={9}
+              onChangeText={(text) => setDescription(text)}
+            />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Gender?</FormControl.Label>
@@ -56,7 +97,13 @@ export default function AddWorkerScreen() {
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Preferred Max Difficulty?</FormControl.Label>
-            <Radio.Group nativeID='patani' name='difficulty' defaultValue='5' colorScheme='green'>
+            <Radio.Group
+              name='difficulty'
+              value={difficulty}
+              onChange={(nextValue) => setDifficulty(nextValue)}
+              accessibilityLabel='choose difficulty'
+              colorScheme='green'
+            >
               <HStack space='3'>
                 <Radio value='1'>1</Radio>
                 <Radio value='2'>2</Radio>
@@ -84,6 +131,7 @@ export default function AddWorkerScreen() {
           endIcon={<AddIcon size='3' />}
           onPress={() => {
             setLoading(true);
+            addWorker();
             setTimeout(() => {
               setLoading(false);
             }, 2000);
@@ -92,8 +140,6 @@ export default function AddWorkerScreen() {
           Add Worker
         </Button>
       </Box>
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );
@@ -102,7 +148,5 @@ export default function AddWorkerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
 });
