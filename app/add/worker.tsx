@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 import {
   Box,
   VStack,
@@ -14,42 +15,33 @@ import {
   HStack,
 } from 'native-base';
 import { View } from '../../components/Themed';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
-  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
-  projectId: 'byteme-a2fdf',
-  storageBucket: 'byteme-a2fdf.appspot.com',
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+import { db } from '../../config/firebase';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 export default function AddWorkerScreen() {
+  const { push } = useRouter();
   const [isLoading, setLoading] = useState(false);
-  const [worker, setWorker] = useState('');
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [groupValues, setGroupValues] = useState(['day', 'night']);
-  const [difficulty, setDifficulty] = useState('5');
+  const [preferredShift, setPreferredShift] = useState(['day', 'night']);
+  const [maxDifficulty, setMaxDifficulty] = useState('5');
+  const [gender, setGender] = useState('m');
 
-  const addWorker = () => {
-    // const workersCollectionRef = firebase.firestore().collection('workers');
-    // workersCollectionRef
-    //   .add({
-    //     name: worker,
-    //     description: description,
-    //     preferredShift: groupValues,
-    //     difficulty: difficulty,
-    //   })
-    //   .then(() => {
-    //     console.log('Worker added to Firestore');
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error adding worker to Firestore:', error);
-    //   });
+  const addWorker = async () => {
+    try {
+      const workersCollectionRef = await addDoc(collection(db, 'workers'), {
+        name,
+        description,
+        preferredShift,
+        maxDifficulty,
+        gender,
+      });
+      console.log('Work written with ID: ', workersCollectionRef.id);
+      push('/workers');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+    setLoading(false);
   };
 
   return (
@@ -58,7 +50,7 @@ export default function AddWorkerScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Worker Name?</FormControl.Label>
-            <Input placeholder='Title' borderRadius={9} onChangeText={(text) => setWorker(text)} />
+            <Input placeholder='Title' borderRadius={9} onChangeText={(text) => setName(text)} />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Worker Description?</FormControl.Label>
@@ -70,7 +62,13 @@ export default function AddWorkerScreen() {
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Gender?</FormControl.Label>
-            <Radio.Group nativeID='patani' name='gender' defaultValue='m' colorScheme='green'>
+            <Radio.Group
+              nativeID='patani'
+              name='gender'
+              value={gender}
+              onChange={(value) => setGender(value)}
+              colorScheme='green'
+            >
               <HStack space='3'>
                 <Radio value='m'>Male</Radio>
                 <Radio value='f'>Female</Radio>
@@ -80,8 +78,8 @@ export default function AddWorkerScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Preferred Shift?</FormControl.Label>
             <Checkbox.Group
-              onChange={setGroupValues}
-              value={groupValues}
+              onChange={setPreferredShift}
+              value={preferredShift}
               accessibilityLabel='choose shift'
               colorScheme='green'
             >
@@ -94,10 +92,10 @@ export default function AddWorkerScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Preferred Max Difficulty?</FormControl.Label>
             <Radio.Group
-              name='difficulty'
-              value={difficulty}
-              onChange={(nextValue) => setDifficulty(nextValue)}
-              accessibilityLabel='choose difficulty'
+              name='maxDifficulty'
+              value={maxDifficulty}
+              onChange={(nextValue) => setMaxDifficulty(nextValue)}
+              accessibilityLabel='choose max difficulty'
               colorScheme='green'
             >
               <HStack space='3'>
