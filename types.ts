@@ -3,3 +3,8 @@ export type RateWorkSearchParams = {
   description: string;
   worker: string;
 };
+
+export type SelectWorker = {
+  id: string;
+  name: string;
+};

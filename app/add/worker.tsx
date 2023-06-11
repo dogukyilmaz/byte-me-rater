@@ -15,48 +15,28 @@ import {
 } from 'native-base';
 import { View } from '../../components/Themed';
 
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
-  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
-  projectId: 'byteme-a2fdf',
-  storageBucket: 'byteme-a2fdf.appspot.com',
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-export default function AddWorkerScreen() {
-  const [isLoading, setLoading] = useState(false);
-  const [worker, setWorker] = useState('');
-  const [description, setDescription] = useState('');
-
-
-  
-
 export default function AddWorkerScreen() {
   const [isLoading, setLoading] = useState(false);
   const [groupValues, setGroupValues] = useState(['day', 'night']);
   const [difficulty, setDifficulty] = useState('5');
+  const [worker, setWorker] = useState('');
+  const [description, setDescription] = useState('');
 
   const addWorker = () => {
-    const workersCollectionRef = firebase.firestore().collection('workers');
-    workersCollectionRef
-      .add({
-        name: worker,
-        description: description,
-        preferredShift: groupValues,
-        difficulty: difficulty,
-      })
-      .then(() => {
-        console.log('Worker added to Firestore');
-      })
-      .catch((error) => {
-        console.error('Error adding worker to Firestore:', error);
-      });
+    // const workersCollectionRef = firebase.firestore().collection('workers');
+    // workersCollectionRef
+    //   .add({
+    //     name: worker,
+    //     description: description,
+    //     preferredShift: groupValues,
+    //     difficulty: difficulty,
+    //   })
+    //   .then(() => {
+    //     console.log('Worker added to Firestore');
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error adding worker to Firestore:', error);
+    //   });
   };
 
   return (
@@ -65,11 +45,7 @@ export default function AddWorkerScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Worker Name?</FormControl.Label>
-            <Input
-              placeholder='Title'
-              borderRadius={9}
-              onChangeText={(text) => setWorker(text)}
-            />
+            <Input placeholder='Title' borderRadius={9} onChangeText={(text) => setWorker(text)} />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Worker Description?</FormControl.Label>
