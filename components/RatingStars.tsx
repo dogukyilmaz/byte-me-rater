@@ -13,7 +13,7 @@ const RatingStars = ({ rating, color, size = 14, showRating = false }: RatingSta
   const stars = getStarRatings(rating);
 
   return (
-    <HStack alignItems='center'>
+    <HStack>
       {stars.map((star, index) => (
         <Ionicons
           key={index}

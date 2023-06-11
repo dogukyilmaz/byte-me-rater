@@ -53,7 +53,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
                 name: item.name || "Doesn't exist",
                 description: item.description || "Doesn't exist",
                 maxDifficulty: item.maxDifficulty || "Doesn't exist",
-                rating: item.rating || "Doesn't exist",
+                rating: item.rating || 3,
                 gender: item.gender || "Doesn't exist",
               },
             }}
@@ -71,7 +71,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
             >
               <HStack space={[2, 2]} justifyContent='space-between'>
                 <Center
-                  background={ratingColorPicker(item.rating)}
+                  background={ratingColorPicker(item.rating || 3)}
                   borderRadius='full'
                   alignItems='center'
                   justifyContent='center'
@@ -97,7 +97,7 @@ const WorkerList = ({ data }: WorkerListProps) => {
   
                     <Badge
                       borderRadius={9}
-                      bg={difficultyColorPicker(item.maxDifficulty)}
+                      bg={difficultyColorPicker(item.maxDifficulty || 3)}
                       ml={2}
                       p={0}
                       px='1'
