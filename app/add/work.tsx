@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 import {
   Box,
   VStack,
@@ -16,66 +17,54 @@ import {
   HStack,
 } from 'native-base';
 import { View } from '../../components/Themed';
-import { WORKERS as CONSTANTS_WORKERS } from '../../constants/workers';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
-  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
-  projectId: 'byteme-a2fdf',
-  storageBucket: 'byteme-a2fdf.appspot.com',
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import type { SelectWorker } from '../../types';
 
 export default function AddWorkScreen() {
-  const [isLoading, setLoading] = useState(false);
+  const { push } = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [worker, setWorker] = useState('');
   const [shift, setShift] = useState('day');
   const [difficulty, setDifficulty] = useState('1');
-  const [workers, setWorkers] = useState([]);
+
+  const [isLoading, setLoading] = useState(false);
+  const [workers, setWorkers] = useState<SelectWorker[]>([]);
 
   useEffect(() => {
-    const fetchWorkers = async () => {
-      try {
-        const workersCollectionRef = firebase.firestore().collection('workers');
-        const snapshot = await workersCollectionRef.get();
-
-        const workersData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setWorkers([...CONSTANTS_WORKERS, ...workersData]);
-      } catch (error) {
-        console.error('Error fetching workers from Firestore:', error);
-      }
-    };
-
     fetchWorkers();
   }, []);
 
-  const addWork = () => {
-    const worksCollectionRef = firebase.firestore().collection('works');
-    worksCollectionRef
-      .add({
-        title: title,
-        description: description,
-        worker: worker,
-        shift: shift,
-        difficulty: difficulty,
-      })
-      .then(() => {
-        console.log('Work added to Firestore');
-      })
-      .catch((error) => {
-        console.error('Error adding work to Firestore:', error);
+  const fetchWorkers = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'workers'));
+      const workersData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setWorkers(workersData);
+    } catch (error) {
+      console.error('Error fetching workers from Firestore:', error);
+    }
+  };
+
+  const addWork = async () => {
+    setLoading(true);
+    try {
+      const docRef = await addDoc(collection(db, 'works'), {
+        title,
+        description,
+        worker,
+        shift,
+        difficulty,
       });
+      console.log('Work written with ID: ', docRef.id);
+      push('/works');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+    setLoading(false);
   };
 
   return (
@@ -84,11 +73,7 @@ export default function AddWorkScreen() {
         <VStack space='5'>
           <FormControl>
             <FormControl.Label mb='1'>Work Title?</FormControl.Label>
-            <Input
-              placeholder='Title'
-              borderRadius={9}
-              onChangeText={(text) => setTitle(text)}
-            />
+            <Input placeholder='Title' borderRadius={9} onChangeText={(text) => setTitle(text)} />
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Work Description?</FormControl.Label>
@@ -167,13 +152,7 @@ export default function AddWorkScreen() {
           isLoading={isLoading}
           endIcon={<AddIcon size='3' />}
           borderRadius={10}
-          onPress={() => {
-            setLoading(true);
-            addWork();
-            setTimeout(() => {
-              setLoading(false);
-            }, 2000);
-          }}
+          onPress={addWork}
         >
           Create Work
         </Button>
