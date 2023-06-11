@@ -38,6 +38,7 @@ if (!firebase.apps.length) {
 export default function RateWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [rating, setRating] = useState('5');
@@ -47,10 +48,7 @@ export default function RateWorkScreen() {
 
     try {
       const worksCollectionRef = firebase.firestore().collection('works');
-      const querySnapshot = await worksCollectionRef
-        .where('title', '==', title)
-        .limit(1)
-        .get();
+      const querySnapshot = await worksCollectionRef.where('title', '==', title).limit(1).get();
 
       if (!querySnapshot.empty) {
         const workDoc = querySnapshot.docs[0];
@@ -79,10 +77,7 @@ export default function RateWorkScreen() {
     const fetchComments = async () => {
       try {
         const worksCollectionRef = firebase.firestore().collection('works');
-        const querySnapshot = await worksCollectionRef
-          .where('title', '==', title)
-          .limit(1)
-          .get();
+        const querySnapshot = await worksCollectionRef.where('title', '==', title).limit(1).get();
 
         if (!querySnapshot.empty) {
           const workDoc = querySnapshot.docs[0];
