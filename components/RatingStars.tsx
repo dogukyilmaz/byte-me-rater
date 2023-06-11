@@ -26,7 +26,7 @@ const RatingStars = ({ rating, color, size = 14, showRating = false }: RatingSta
       ))}
       {showRating && (
         <Text ml='2' fontSize={size * 0.8} color='gray.400'>
-          {rating}/5
+          {rating || 0}/5
         </Text>
       )}
     </HStack>
