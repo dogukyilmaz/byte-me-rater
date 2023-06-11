@@ -35,7 +35,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-export default function AddWorkScreen() {
+export default function RateWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
   const [comments, setComments] = useState([]);
