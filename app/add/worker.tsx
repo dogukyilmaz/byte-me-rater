@@ -11,16 +11,12 @@ import {
   Checkbox,
   AddIcon,
   Button,
-  Select,
-  CheckIcon,
   HStack,
 } from 'native-base';
 import { View } from '../../components/Themed';
-import { WORKERS } from '../../constants/workers';
 
 export default function AddWorkerScreen() {
   const [isLoading, setLoading] = useState(false);
-  const [worker, setWorker] = useState('');
   const [groupValues, setGroupValues] = useState(['day', 'night']);
 
   return (
@@ -34,6 +30,15 @@ export default function AddWorkerScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Worker Description?</FormControl.Label>
             <Input placeholder='Description' borderRadius={9} />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label mb='1'>Gender?</FormControl.Label>
+            <Radio.Group nativeID='patani' name='gender' defaultValue='m' colorScheme='green'>
+              <HStack space='3'>
+                <Radio value='m'>Male</Radio>
+                <Radio value='f'>Female</Radio>
+              </HStack>
+            </Radio.Group>
           </FormControl>
           <FormControl>
             <FormControl.Label mb='1'>Preferred Shift?</FormControl.Label>
@@ -64,7 +69,7 @@ export default function AddWorkerScreen() {
           <VStack space={5} my={4}>
             <Divider />
             <Checkbox size='sm' value='tnc' justifyContent='center' colorScheme='green'>
-              I agree to add work terms and conditions.
+              I agree to add worker terms and conditions.
             </Checkbox>
             <Divider />
           </VStack>
