@@ -47,7 +47,7 @@ export const getStarRatings = (rating: number) => {
   // getStarRating(4.1) ['full', 'full', 'full', 'full', 'empty']
 
   return Array.from({ length: 5 }, (_, i) => {
-    const precision = rating.toFixed(1).split('.');
+    const precision = rating?.toFixed(1).split('.');
     const [major, minor] = [Number(precision[0]), Number(precision[1])];
 
     const isFilled = i < major;

@@ -21,7 +21,7 @@ import {
 } from 'native-base';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
 import { Link } from 'expo-router';
 import { difficultyColorPicker, difficultyTagPicker, ratingColorPicker } from '../utils';
@@ -30,14 +30,67 @@ import type { Work } from '../types';
 type WorkListProps = {
   data: Work[];
 };
+type Filter = {
+  shift: string;
+  difficulty: string;
+  minRating: number;
+};
 
 const WorkList = ({ data }: WorkListProps) => {
+  const [filtered, setFiltered] = useState<Work[]>([]);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<Filter>({
+    shift: '',
+    difficulty: '',
+    minRating: 0,
+  });
+
+  useEffect(() => {
+    const d = data.filter(
+      (item) =>
+        item.title.toLowerCase().includes(search.toLowerCase()) ||
+        item.description.toLowerCase().includes(search.toLowerCase())
+    );
+    setFiltered(d);
+  }, [search, data]);
+
+  const filterData = () => {
+    let d = data;
+    if (filter.shift) d = d.filter((item) => item.shift === filter.shift);
+    if (filter.difficulty)
+      d = d.filter((item) => Number(item.difficulty) >= Number(filter.difficulty));
+    if (filter.minRating) d = d.filter((item) => item.rating >= filter.minRating);
+    setFiltered(d);
+  };
+
+  const handleSetFilter = (key: string, value: any) => {
+    setFilter((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const clearFilter = () => {
+    setFilter({
+      shift: '',
+      difficulty: '',
+      minRating: 0,
+    });
+    setFiltered(data);
+    setSearch('');
+  };
+
   return (
     <Box flex={1} paddingLeft={4}>
-      <Filter />
+      <Filter
+        filter={filter}
+        handleSetFilter={handleSetFilter}
+        search={search}
+        setSearch={setSearch}
+        filterData={filterData}
+        clearFilter={clearFilter}
+      />
 
       <FlatList
-        data={data}
+        refreshing={true}
+        data={filtered}
         renderItem={({ item }) => (
           <Link
             asChild
@@ -72,7 +125,7 @@ const WorkList = ({ data }: WorkListProps) => {
                   my='auto'
                 >
                   <Text fontSize={16} fontWeight={700} color='#FFF'>
-                    {item.rating.toFixed(1)}
+                    {item.rating?.toFixed(1)}
                   </Text>
                 </Center>
                 <VStack space='1'>
@@ -148,9 +201,22 @@ const WorkList = ({ data }: WorkListProps) => {
 
 export default WorkList;
 
-const Filter = () => {
+const Filter = ({
+  filter,
+  handleSetFilter,
+  search,
+  setSearch,
+  filterData,
+  clearFilter,
+}: {
+  filter: Filter;
+  search: string;
+  clearFilter: () => void;
+  setSearch: (value: string) => void;
+  handleSetFilter: (key: string, value: any) => void;
+  filterData: () => void;
+}) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [rating, setRating] = useState(0);
   const initialRef = useRef(null);
   const finalRef = useRef(null);
 
@@ -165,6 +231,8 @@ const Filter = () => {
             borderRadius='10'
             py={Platform.OS === 'ios' ? '2' : '1'}
             px='2'
+            value={search}
+            onChangeText={(text) => setSearch(text)}
             InputLeftElement={
               <Icon ml='2' size='4' color='gray.400' as={<Ionicons name='ios-search' />} />
             }
@@ -198,7 +266,12 @@ const Filter = () => {
             <VStack space='3'>
               <FormControl>
                 <FormControl.Label mb='1'>Shift</FormControl.Label>
-                <Radio.Group nativeID='patani' name='day_night' colorScheme='gray'>
+                <Radio.Group
+                  name='day_night'
+                  colorScheme='gray'
+                  value={filter.shift}
+                  onChange={(nextValue) => handleSetFilter('shift', nextValue)}
+                >
                   <HStack space='3'>
                     <Radio size='sm' value='day'>
                       Day
@@ -211,32 +284,41 @@ const Filter = () => {
               </FormControl>
               <FormControl>
                 <FormControl.Label mb='1'>Difficulty</FormControl.Label>
-                <Radio.Group nativeID='patani' name='difficulty' colorScheme='gray'>
-                  <HStack space='3'>
-                    <Radio size='sm' value='1'>
-                      1
-                    </Radio>
-                    <Radio size='sm' value='2'>
-                      2
-                    </Radio>
-                    <Radio size='sm' value='3'>
-                      3
-                    </Radio>
-                    <Radio size='sm' value='4'>
-                      4
-                    </Radio>
-                    <Radio size='sm' value='5'>
-                      5
-                    </Radio>
-                  </HStack>
+                <Radio.Group
+                  name='difficulty'
+                  colorScheme='gray'
+                  value={filter.difficulty}
+                  onChange={(nextValue) => handleSetFilter('difficulty', nextValue)}
+                >
+                  <VStack space='2'>
+                    <HStack space='3'>
+                      <Radio size='sm' value='1'>
+                        Easy
+                      </Radio>
+                      <Radio size='sm' value='2'>
+                        Normal
+                      </Radio>
+                      <Radio size='sm' value='3'>
+                        Medium
+                      </Radio>
+                    </HStack>
+                    <HStack space='3'>
+                      <Radio size='sm' value='4'>
+                        Hard
+                      </Radio>
+                      <Radio size='sm' value='5'>
+                        Expert
+                      </Radio>
+                    </HStack>
+                  </VStack>
                 </Radio.Group>
               </FormControl>
               <FormControl>
-                <FormControl.Label mb='1'>Minimum Rating ({rating})</FormControl.Label>
+                <FormControl.Label mb='1'>Minimum Rating ({filter.minRating})</FormControl.Label>
                 <Slider
-                  value={rating}
+                  value={filter.minRating}
                   colorScheme='gray'
-                  onChange={(e) => setRating(e)}
+                  onChange={(e) => handleSetFilter('minRating', e)}
                   minValue={0}
                   maxValue={5}
                   step={0.5}
@@ -250,7 +332,7 @@ const Filter = () => {
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <Button.Group space={2}>
+            <HStack width='100%'>
               <Button
                 size='sm'
                 variant='ghost'
@@ -261,16 +343,31 @@ const Filter = () => {
               >
                 Cancel
               </Button>
+              <Spacer />
+
+              <Button
+                size='sm'
+                variant='ghost'
+                colorScheme='gray'
+                onPress={() => {
+                  clearFilter();
+                  setModalVisible(false);
+                }}
+              >
+                Clear
+              </Button>
+
               <Button
                 size='sm'
                 colorScheme='gray'
                 onPress={() => {
+                  filterData();
                   setModalVisible(false);
                 }}
               >
                 Apply
               </Button>
-            </Button.Group>
+            </HStack>
           </Modal.Footer>
         </Modal.Content>
       </Modal>

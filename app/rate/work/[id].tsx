@@ -45,7 +45,7 @@ export default function RateWorkScreen() {
 
   const addComment = async () => {
     if (newComment.trim() === '') return;
-
+    setLoading(true);
     try {
       const worksCollectionRef = firebase.firestore().collection('works');
       const querySnapshot = await worksCollectionRef.where('title', '==', title).limit(1).get();
@@ -71,6 +71,7 @@ export default function RateWorkScreen() {
     } catch (error) {
       console.error('Error adding comment:', error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {

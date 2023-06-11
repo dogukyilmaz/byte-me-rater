@@ -99,7 +99,7 @@ export default function AddWorkScreen() {
               onValueChange={(itemValue) => setWorker(itemValue)}
             >
               {workers.map((worker) => (
-                <Select.Item key={worker.id} label={worker.name} value={worker.name.toString()} />
+                <Select.Item key={worker.id} label={worker.name} value={worker.name?.toString()} />
               ))}
             </Select>
           </FormControl>
@@ -127,13 +127,17 @@ export default function AddWorkScreen() {
               accessibilityLabel='choose difficulty'
               colorScheme='secondary'
             >
-              <HStack space='3'>
-                <Radio value='1'>1</Radio>
-                <Radio value='2'>2</Radio>
-                <Radio value='3'>3</Radio>
-                <Radio value='4'>4</Radio>
-                <Radio value='5'>5</Radio>
-              </HStack>
+              <VStack space='3'>
+                <HStack space='3'>
+                  <Radio value='1'>Easy</Radio>
+                  <Radio value='2'>Normal</Radio>
+                  <Radio value='3'>Medium</Radio>
+                </HStack>
+                <HStack space='3'>
+                  <Radio value='4'>Hard</Radio>
+                  <Radio value='5'>Expert</Radio>
+                </HStack>
+              </VStack>
             </Radio.Group>
           </FormControl>
           <VStack space={5} my={4}>
