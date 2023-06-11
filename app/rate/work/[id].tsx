@@ -23,8 +23,19 @@ import { ratingColorPicker } from '../../../utils';
 import type { RateWorkSearchParams } from '../../../types';
 
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
-export default function AddWorkScreen() {
+const firebaseConfig = {
+  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
+  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
+  projectId: 'byteme-a2fdf',
+  storageBucket: 'byteme-a2fdf.appspot.com',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+export default function RateWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
 
