@@ -99,7 +99,7 @@ export default function AddWorkScreen() {
               onValueChange={(itemValue) => setWorker(itemValue)}
             >
               {workers.map((worker) => (
-                <Select.Item key={worker.id} label={worker.name} value={worker.id.toString()} />
+                <Select.Item key={worker.id} label={worker.name} value={worker.name.toString()} />
               ))}
             </Select>
           </FormControl>
