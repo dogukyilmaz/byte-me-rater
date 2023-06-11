@@ -25,7 +25,7 @@ import { useState, useRef } from 'react';
 import { Platform } from 'react-native';
 import { Link } from 'expo-router';
 import { difficultyColorPicker, difficultyTagPicker, ratingColorPicker } from '../utils';
-import type { Work } from '../constants/works';
+import type { Work } from '../types';
 
 type WorkListProps = {
   data: Work[];
