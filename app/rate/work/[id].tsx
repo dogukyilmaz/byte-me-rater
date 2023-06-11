@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -22,11 +22,83 @@ import { useSearchParams } from 'expo-router';
 import { ratingColorPicker } from '../../../utils';
 import type { RateWorkSearchParams } from '../../../types';
 
-import { WORKS_COMMENTS } from '../../../constants/works';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
+const firebaseConfig = {
+  apiKey: 'AIzaSyDyF_dX0eMwvw3MGmsnUsP1NHybRGzMAzE',
+  authDomain: '388749525367-1frbbgeg507rmt9kcmujicr26qet5058.apps.googleusercontent.com',
+  projectId: 'byteme-a2fdf',
+  storageBucket: 'byteme-a2fdf.appspot.com',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 export default function AddWorkScreen() {
   const [isLoading, setLoading] = useState(false);
   const { title, description, worker } = useSearchParams<RateWorkSearchParams>();
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [rating, setRating] = useState('5');
+
+  const addComment = async () => {
+    if (newComment.trim() === '') return;
+
+    try {
+      const worksCollectionRef = firebase.firestore().collection('works');
+      const querySnapshot = await worksCollectionRef
+        .where('title', '==', title)
+        .limit(1)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const workDoc = querySnapshot.docs[0];
+        const commentsCollectionRef = workDoc.ref.collection('comments');
+
+        await commentsCollectionRef.add({
+          comment: newComment,
+          puan: parseInt(rating),
+        });
+
+        // Update the comments list
+        const commentsSnapshot = await commentsCollectionRef.get();
+        const commentsData = commentsSnapshot.docs.map((doc) => doc.data());
+        setComments(commentsData);
+
+        // Clear the input fields
+        setNewComment('');
+        setRating('5');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const worksCollectionRef = firebase.firestore().collection('works');
+        const querySnapshot = await worksCollectionRef
+          .where('title', '==', title)
+          .limit(1)
+          .get();
+
+        if (!querySnapshot.empty) {
+          const workDoc = querySnapshot.docs[0];
+          const commentsCollectionRef = workDoc.ref.collection('comments');
+          const commentsSnapshot = await commentsCollectionRef.get();
+
+          const commentsData = commentsSnapshot.docs.map((doc) => doc.data());
+          setComments(commentsData);
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+
+    fetchComments();
+  }, [title]);
 
   return (
     <View style={styles.container}>
@@ -39,6 +111,8 @@ export default function AddWorkScreen() {
           <FormControl>
             <FormControl.Label mb='1'>Comment</FormControl.Label>
             <TextArea
+              value={newComment}
+              onChangeText={(text) => setNewComment(text)}
               autoCompleteType={false}
               placeholder='Write your comment here'
               borderRadius={9}
@@ -50,7 +124,13 @@ export default function AddWorkScreen() {
           <HStack>
             <FormControl>
               <FormControl.Label mb='1'>Rating</FormControl.Label>
-              <Radio.Group nativeID='patani' name='rating' defaultValue='5' colorScheme='secondary'>
+              <Radio.Group
+                nativeID='patani'
+                name='rating'
+                value={rating}
+                onChange={(value) => setRating(value)}
+                colorScheme='secondary'
+              >
                 <HStack space='3'>
                   <Radio value='1'>1</Radio>
                   <Radio value='2'>2</Radio>
@@ -70,12 +150,7 @@ export default function AddWorkScreen() {
               isLoading={isLoading}
               endIcon={<AddIcon size='3' />}
               borderRadius={10}
-              onPress={() => {
-                setLoading(true);
-                setTimeout(() => {
-                  setLoading(false);
-                }, 2000);
-              }}
+              onPress={addComment}
             >
               Rate
             </Button>
@@ -103,7 +178,7 @@ export default function AddWorkScreen() {
             </Heading>
 
             <FlatList
-              data={WORKS_COMMENTS}
+              data={comments}
               renderItem={({ item }) => (
                 <HStack
                   key={item.id}
@@ -128,7 +203,7 @@ export default function AddWorkScreen() {
                     {item.comment}
                   </Text>
                   <Center
-                    background={ratingColorPicker(item.rating)}
+                    background={ratingColorPicker(item.puan)}
                     borderRadius='full'
                     width={10}
                     height={10}
@@ -137,7 +212,7 @@ export default function AddWorkScreen() {
                     my='auto'
                   >
                     <Text fontSize={16} fontWeight={700} color='#FFF'>
-                      {item.rating}
+                      {item.puan}
                     </Text>
                   </Center>
                 </HStack>
