@@ -72,7 +72,7 @@ const WorkList = ({ data }: WorkListProps) => {
                   my='auto'
                 >
                   <Text fontSize={16} fontWeight={700} color='#FFF'>
-                    {item.rating}
+                    {item.rating.toFixed(1)}
                   </Text>
                 </Center>
                 <VStack space='1'>
