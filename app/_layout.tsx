@@ -5,6 +5,7 @@ import { SplashScreen, Stack, usePathname, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Text, useColorScheme } from 'react-native';
 import { NativeBaseProvider } from 'native-base';
+import { SSRProvider } from '@react-aria/ssr';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -40,7 +41,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <>
+    <SSRProvider>
       <NativeBaseProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
@@ -50,12 +51,20 @@ function RootLayoutNav() {
               options={{ presentation: 'card', headerTitle: 'Add Work' }}
             />
             <Stack.Screen
+              name='rate/work/[id]'
+              options={{ presentation: 'modal', headerTitle: 'Rate & Comment - Work' }}
+            />
+            <Stack.Screen
               name='add/worker'
               options={{ presentation: 'card', headerTitle: 'Add Worker' }}
+            />
+            <Stack.Screen
+              name='rate/worker/[id]'
+              options={{ presentation: 'modal', headerTitle: 'Rate & Comment - Worker' }}
             />
           </Stack>
         </ThemeProvider>
       </NativeBaseProvider>
-    </>
+    </SSRProvider>
   );
 }

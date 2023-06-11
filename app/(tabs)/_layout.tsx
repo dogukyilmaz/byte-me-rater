@@ -1,5 +1,5 @@
 import FontAwesome from '@expo/vector-icons/Feather';
-import { Link, Tabs, usePathname } from 'expo-router';
+import { Link, Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
 import Colors from '../../constants/Colors';
@@ -17,7 +17,6 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const pathname = usePathname();
 
   return (
     <Tabs
